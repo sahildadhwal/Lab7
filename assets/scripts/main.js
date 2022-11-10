@@ -149,6 +149,7 @@ async function getRecipes() {
         console.error(error);
         
         // A11. TODO: - Pass any errors to the Promise's reject() function
+        // const z = await Promise.reject(30);
         reject(error);
 
       }
