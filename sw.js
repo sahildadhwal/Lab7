@@ -7,9 +7,18 @@ const CACHE_NAME = 'lab-7-starter';
 self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
-      // B6. TODO - Add all of the URLs from RECIPE_URLs here so that they are
+      // B6. TODO: - Add all of the URLs from RECIPE_URLs here so that they are
       //            added to the cache when the ServiceWorker is installed
-      return cache.addAll([]);
+      const RECIPE_URLS = [
+        'https://introweb.tech/assets/json/1_50-thanksgiving-side-dishes.json',
+        'https://introweb.tech/assets/json/2_roasting-turkey-breast-with-stuffing.json',
+        'https://introweb.tech/assets/json/3_moms-cornbread-stuffing.json',
+        'https://introweb.tech/assets/json/4_50-indulgent-thanksgiving-side-dishes-for-any-holiday-gathering.json',
+        'https://introweb.tech/assets/json/5_healthy-thanksgiving-recipe-crockpot-turkey-breast.json',
+        'https://introweb.tech/assets/json/6_one-pot-thanksgiving-dinner.json',
+      ];
+      //return cache.addAll([]);
+      return cache.addAll(RECIPE_URLS);
     })
   );
 });
@@ -32,9 +41,24 @@ self.addEventListener('fetch', function (event) {
   //       fetch(event.request)
   // https://developer.chrome.com/docs/workbox/caching-strategies-overview/
   /*******************************/
-  // B7. TODO - Respond to the event by opening the cache using the name we gave
+  
+  // B7. TODO: - Respond to the event by opening the cache using the name we gave
   //            above (CACHE_NAME)
-  // B8. TODO - If the request is in the cache, return with the cached version.
-  //            Otherwise fetch the resource, add it to the cache, and return
-  //            network response.
+  event.respondWith(caches.open(CACHE_NAME).then((cache) => { 
+    // B8. TODO: - If the request is in the cache, return with the cached version.
+    //            Otherwise fetch the resource, add it to the cache, and return
+    //            network response.
+    return cache.match(event.request).then((cachedResponse) => {
+      return cachedResponse || fetch(event.request.url).then((fetchedResponse) => {
+        // Add the network response to the cache for future visits.
+        // Note: we need to make a copy of the response to save it in
+        // the cache and use the original as the request response.
+        cache.put(event.request, fetchedResponse.clone());
+
+        // Return the network response
+        return fetchedResponse;
+      });
+    });
+  }));
+
 });
