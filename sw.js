@@ -48,20 +48,17 @@ self.addEventListener('fetch', function (event) {
     // B8. TODO: - If the request is in the cache, return with the cached version.
     //            Otherwise fetch the resource, add it to the cache, and return
     //            network response.
-    return cache.match(event.request).then((cachedResponse) => {
-      // If request is in cache respomse return chashed REsponse.
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      // else, fetch resourse and add to cache and then return netwrk repsonse
-      return fetch(event.request).then((fetchedResponse) => {
+    // if request is in cache, return cached response
+    if(cache.match(event.request)){
+      return cachedResponse;
+    } 
+    // else it is NOT in cache, so add to cache and return netwrk response
+    else {
+      fetch(event.request).then((fetchedResponse) => {
         cache.put(event.request, fetchedResponse.clone());
-        // Return the network response
-      return fetchedResponse;
-
+        
+        return fetchedResponse;
       });
-    });
+    }
   }));
-
-
 });
